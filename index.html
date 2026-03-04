@@ -217,12 +217,25 @@
     .btn-apple:hover { background: #666; }
     .btn-icon { font-size: 1.1rem; }
 
-    .view-edit-link {
-      text-align: center;
-      margin-top: 1rem;
+    .view-add-note { margin-top: 1.25rem; text-align: center; }
+    .view-note-area {
+      margin-top: 0.75rem;
+      text-align: left;
     }
-    .view-edit-link a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
-    .view-edit-link a:hover { text-decoration: underline; }
+    .view-note-area textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .view-note-area .btn { margin-top: 0.5rem; }
+    .btn-note { background: var(--border); color: var(--text); }
+    .btn-note:hover { background: #3a3a45; }
 
     .hidden { display: none !important; }
   </style>
@@ -277,8 +290,6 @@
             <input type="text" id="address" name="address" placeholder="" data-i18n-ph="address">
           </div>
           <div>
-            <label for="logoUrl" data-i18n="labelLogo">Logo (görsel linki)</label>
-            <input type="url" id="logoUrl" name="logoUrl" placeholder="https://... veya boş bırakın" data-i18n-ph="logoUrl">
             <p class="hint" style="margin-top: 0.35rem;" data-i18n="logoHint">Logonuzu bir yere yükleyip linkini yapıştırın (örn. GitHub’a logo.png ekleyip buraya sayfa linkini yazın).</p>
           </div>
           <button type="button" class="btn" id="btnUpdateQr" data-i18n="btnUpdate">QR Kodu Güncelle</button>
@@ -328,21 +339,12 @@
       <div class="card-title" id="viewTitle">—</div>
       <div class="card-details" id="viewDetails"></div>
     </div>
-    <div class="view-add-contact">
-      <p class="view-add-contact-title" data-i18n="addToContacts">Rehbere ekle</p>
-      <div class="view-add-contact-btns">
-        <a href="#" id="btnSaveContactAndroid" class="btn btn-android">
-          <span class="btn-icon">🤖</span>
-          <span data-i18n="addAndroid">Android</span>
-        </a>
-        <a href="#" id="btnSaveContactApple" class="btn btn-apple">
-          <span class="btn-icon">🍎</span>
-          <span data-i18n="addApple">iPhone / iPad</span>
-        </a>
+    <div class="view-add-note">
+      <button type="button" class="btn btn-note" id="btnAddNote" data-i18n="addNote">Not ekle</button>
+      <div class="view-note-area hidden" id="viewNoteArea">
+        <textarea id="viewNoteText" rows="4" placeholder="" data-i18n-ph="notePlaceholder"></textarea>
+        <button type="button" class="btn btn-secondary" id="btnCopyNote" data-i18n="copyNote">Notu kopyala</button>
       </div>
-    </div>
-    <div class="view-edit-link">
-      <a href="" id="editLink" data-i18n="editLink">Kartviziti düzenle</a>
     </div>
   </div>
 
@@ -373,11 +375,10 @@
           qrLinkDesc: 'Bu linki paylaşın veya aşağıdaki QR ile kartvizitinizi taratın.',
           qrLinkEmpty: 'Bilgileri doldurup "QR Kodu Güncelle"ye tıklayın.',
           btnCopyLink: 'Paylaşım linkini kopyala',
-          editLink: 'Kartviziti düzenle',
-          addToContacts: 'Rehbere ekle',
-          addAndroid: 'Android',
-          addApple: 'iPhone / iPad',
-          ph: { name: 'Örn: Ahmet Yılmaz', title: 'Örn: Yazılım Geliştirici', company: 'Örn: ABC Teknoloji', email: 'ahmet@ornek.com', phone: '555 555 55 55', website: 'ornek.com', wechat: 'WeChat ID', address: 'Şehir, ülke', logoUrl: 'https://... veya boş bırakın (logo.jpg kullanır)' }
+          addNote: 'Not ekle',
+          copyNote: 'Notu kopyala',
+          notePlaceholder: 'Buraya notunuzu yazın...',
+          ph: { name: 'Örn: Ahmet Yılmaz', title: 'Örn: Yazılım Geliştirici', company: 'Örn: ABC Teknoloji', email: 'ahmet@ornek.com', phone: '555 555 55 55', website: 'ornek.com', wechat: 'WeChat ID', address: 'Şehir, ülke', notePlaceholder: 'Buraya notunuzu yazın...' }
         },
         en: {
           title: 'QR Digital Business Card',
@@ -403,11 +404,10 @@
           qrLinkDesc: 'Share this link or the QR below so others can view your card.',
           qrLinkEmpty: 'Fill in the form and click "Update QR Code".',
           btnCopyLink: 'Copy share link',
-          editLink: 'Edit card',
-          addToContacts: 'Add to contacts',
-          addAndroid: 'Android',
-          addApple: 'iPhone / iPad',
-          ph: { name: 'e.g. John Doe', title: 'e.g. Developer', company: 'e.g. ABC Inc', email: 'john@example.com', phone: '555 555 55 55', website: 'example.com', wechat: 'WeChat ID', address: 'City, country', logoUrl: 'https://... or leave blank (uses logo.jpg)' }
+          addNote: 'Add note',
+          copyNote: 'Copy note',
+          notePlaceholder: 'Type your note here...',
+          ph: { name: 'e.g. John Doe', title: 'e.g. Developer', company: 'e.g. ABC Inc', email: 'john@example.com', phone: '555 555 55 55', website: 'example.com', wechat: 'WeChat ID', address: 'City, country', notePlaceholder: 'Type your note here...' }
         },
         zh: {
           title: 'QR 电子名片',
@@ -433,11 +433,10 @@
           qrLinkDesc: '分享此链接或下方二维码，他人可查看您的名片。',
           qrLinkEmpty: '请先填写信息并点击“更新二维码”。',
           btnCopyLink: '复制分享链接',
-          editLink: '编辑名片',
-          addToContacts: '添加到通讯录',
-          addAndroid: 'Android',
-          addApple: 'iPhone / iPad',
-          ph: { name: '例如：张三', title: '例如：工程师', company: '例如：某某公司', email: 'zhang@example.com', phone: '555 555 55 55', website: 'example.com', wechat: '微信号', address: '城市，国家', logoUrl: 'https://... 或留空（使用 logo.jpg）' }
+          addNote: '添加备注',
+          copyNote: '复制备注',
+          notePlaceholder: '在此输入备注...',
+          ph: { name: '例如：张三', title: '例如：工程师', company: '例如：某某公司', email: 'zhang@example.com', phone: '555 555 55 55', website: 'example.com', wechat: '微信号', address: '城市，国家', notePlaceholder: '在此输入备注...' }
         }
       };
 
@@ -450,7 +449,6 @@
         var t = L[lang] || L.tr;
         document.querySelectorAll('[data-i18n]').forEach(function (el) {
           var key = el.getAttribute('data-i18n');
-          if (key === 'editLink') { el.textContent = t.editLink; return; }
           if (t[key]) el.textContent = t[key];
         });
         document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
@@ -514,10 +512,13 @@
       var viewDetails = document.getElementById('viewDetails');
       var viewAvatar = document.getElementById('viewAvatar');
       var viewLogo = document.getElementById('viewLogo');
-      var editLink = document.getElementById('editLink');
       var btnUpdateQr = document.getElementById('btnUpdateQr');
+      var viewNoteArea = document.getElementById('viewNoteArea');
+      var viewNoteText = document.getElementById('viewNoteText');
+      var btnAddNote = document.getElementById('btnAddNote');
+      var btnCopyNote = document.getElementById('btnCopyNote');
 
-      var fields = ['name', 'title', 'company', 'email', 'phone', 'website', 'wechat', 'address', 'logoUrl'];
+      var fields = ['name', 'title', 'company', 'email', 'phone', 'website', 'wechat', 'address'];
 
       function getFieldValue(id) {
         if (!form || !form.elements) return '';
@@ -531,8 +532,7 @@
       }
 
       function getLogoUrl() {
-        var url = getFieldValue('logoUrl');
-        return url ? ensureHttps(url) : getDefaultLogoUrl();
+        return getDefaultLogoUrl();
       }
 
       function getInitial() {
@@ -648,7 +648,6 @@
           var val = getFieldValue(id);
           if (id === 'website') val = ensureHttps(val);
           if (id === 'phone') val = getPhoneFull();
-          if (id === 'logoUrl' && val) val = ensureHttps(val);
           if (val) params.set(id, val);
         });
         return base + (params.toString() ? '?' + params.toString() : '');
@@ -676,46 +675,6 @@
         }
       }
 
-      function buildVCardFromParams(params) {
-        var name = (params.get('name') || '').trim();
-        var title = (params.get('title') || '').trim();
-        var company = (params.get('company') || '').trim();
-        var email = (params.get('email') || '').trim();
-        var phone = (params.get('phone') || '').trim();
-        var website = ensureHttps((params.get('website') || '').trim());
-        var address = (params.get('address') || '').trim();
-        var wechat = (params.get('wechat') || '').trim();
-        var lines = ['BEGIN:VCARD', 'VERSION:3.0'];
-        if (name) lines.push('FN:' + name.replace(/\n/g, ' '));
-        if (name) {
-          var parts = name.split(/\s+/);
-          var last = parts.pop() || '';
-          var first = parts.join(' ') || name;
-          lines.push('N:' + last + ';' + first + ';;;');
-        }
-        if (title) lines.push('TITLE:' + title.replace(/\n/g, ' '));
-        if (company) lines.push('ORG:' + company.replace(/\n/g, ' '));
-        if (email) lines.push('EMAIL:' + email);
-        if (phone) lines.push('TEL:' + phone.replace(/\s/g, ''));
-        if (website) lines.push('URL:' + website);
-        if (address) lines.push('ADR:;;' + address.replace(/\n/g, ' ') + ';;;;');
-        if (wechat) lines.push('NOTE:WeChat:' + wechat.replace(/\n/g, ' '));
-        lines.push('END:VCARD');
-        return lines.join('\n');
-      }
-
-      function downloadVCard(vcard, filename) {
-        filename = filename || 'contact.vcf';
-        var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(a.href);
-      }
-
       function showViewMode(params) {
         screenEditor.classList.add('hidden');
         screenView.classList.remove('hidden');
@@ -727,7 +686,7 @@
         var website = params.get('website') || '';
         var wechat = params.get('wechat') || '';
         var address = params.get('address') || '';
-        var logoUrl = (params.get('logoUrl') || '').trim() || getDefaultLogoUrl();
+        var logoUrl = getDefaultLogoUrl();
 
         viewName.textContent = name;
         viewTitle.textContent = [title, company].filter(Boolean).join(' \u00B7 ') || '—';
@@ -756,18 +715,8 @@
           address: address
         }) || '';
 
-        editLink.href = location.origin + location.pathname;
-
-        var vcard = buildVCardFromParams(params);
-        var contactName = (name !== '—' ? name.replace(/\s+/g, '_') : 'contact') + '.vcf';
-        var btnAndroid = document.getElementById('btnSaveContactAndroid');
-        var btnApple = document.getElementById('btnSaveContactApple');
-        if (btnAndroid) {
-          btnAndroid.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
-        }
-        if (btnApple) {
-          btnApple.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
-        }
+        if (viewNoteArea) viewNoteArea.classList.add('hidden');
+        if (viewNoteText) viewNoteText.value = '';
       }
 
       function showEditorMode() {
@@ -796,11 +745,27 @@
         var url = getShareUrl();
         if (!url) return;
         navigator.clipboard.writeText(url).then(function () {
-          var t = copyLinkBtn.getAttribute('data-i18n');
-          copyLinkBtn.textContent = currentLang === 'zh' ? '已复制！' : currentLang === 'en' ? 'Copied!' : 'Kopyalandı!';
+          copyLinkBtn.textContent = currentLang === 'zh' ? '\u5df2\u590d\u5236\uff01' : currentLang === 'en' ? 'Copied!' : 'Kopyalandı!';
           setTimeout(function () { copyLinkBtn.textContent = (L[currentLang] || L.tr).btnCopyLink; }, 2000);
         });
       });
+
+      if (btnAddNote && viewNoteArea) {
+        btnAddNote.addEventListener('click', function () {
+          viewNoteArea.classList.toggle('hidden');
+          if (!viewNoteArea.classList.contains('hidden')) viewNoteText.focus();
+        });
+      }
+      if (btnCopyNote && viewNoteText) {
+        btnCopyNote.addEventListener('click', function () {
+          var text = viewNoteText.value.trim();
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(function () {
+            btnCopyNote.textContent = currentLang === 'zh' ? '\u5df2\u590d\u5236\uff01' : currentLang === 'en' ? 'Copied!' : 'Kopyalandı!';
+            setTimeout(function () { btnCopyNote.textContent = (L[currentLang] || L.tr).copyNote; }, 2000);
+          });
+        });
+      }
 
       function doUpdate() {
         try {
