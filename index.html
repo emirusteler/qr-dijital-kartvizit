@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Digital Business Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --surface: #1a1a1f;
+      --border: #2a2a32;
+      --text: #e8e8ed;
+      --muted: #8888a0;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    .container-view { max-width: 420px; margin: 0 auto; }
+
+    .lang-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .lang-btn {
+      padding: 0.4rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-btn:hover, .lang-btn.active { color: var(--text); border-color: var(--accent); }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+    .layout { display: grid; gap: 2rem; }
+    @media (min-width: 768px) { .layout { grid-template-columns: 1fr 380px; } }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .panel h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-grid { display: grid; gap: 1rem; }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    input::placeholder { color: var(--muted); opacity: 0.7; }
+
+    .phone-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .phone-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+    .phone-prefix {
+      padding: 0.65rem 0.9rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .phone-wrap input {
+      border: none;
+      background: transparent;
+      padding-left: 0;
+    }
+
+    .card-preview {
+      background: linear-gradient(145deg, #1e1e26 0%, #16161c 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .card-avatar, .card-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+    }
+    .card-avatar { background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%); }
+    .card-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .card-name { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .card-title { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .card-details {
+      text-align: left;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .card-details a { color: var(--accent); text-decoration: none; }
+    .card-details a:hover { text-decoration: underline; }
+    .card-details div { margin-bottom: 0.4rem; }
+
+    .qr-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .qr-section h3 { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.75rem; }
+    #qrcode, #qrcodeLink {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      min-width: 200px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    #qrcode img, #qrcodeLink img { display: block; max-width: 100%; height: auto; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; }
+
+    .btn {
+      display: inline-block;
+      padding: 0.7rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--border); margin-top: 0.75rem; }
+    .btn-secondary:hover { background: #3a3a45; }
+    .empty-state { color: var(--muted); font-size: 0.9rem; }
+
+    .view-edit-link {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .view-edit-link a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+    .view-edit-link a:hover { text-decoration: underline; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="screen-editor" class="container">
+    <div class="lang-bar">
+      <button type="button" class="lang-btn active" data-lang="tr">Türkçe</button>
+      <button type="button" class="lang-btn" data-lang="en">English</button>
+      <button type="button" class="lang-btn" data-lang="zh">中文</button>
+    </div>
+    <h1 data-i18n="title">QR Dijital Kartvizit</h1>
+    <p class="subtitle" data-i18n="subtitle">Bilgilerinizi girin, QR kodu oluşturun. Telefonla tarayarak kişiyi rehbere ekleyebilirsiniz.</p>
+
+    <div class="layout">
+      <div class="panel">
+        <h2 data-i18n="formTitle">Kişisel Bilgiler</h2>
+        <form id="form" class="form-grid">
+          <div>
+            <label for="name" data-i18n="labelName">Ad Soyad *</label>
+            <input type="text" id="name" name="name" placeholder="" data-i18n-ph="name">
+          </div>
+          <div>
+            <label for="title" data-i18n="labelTitle">Ünvan</label>
+            <input type="text" id="title" name="title" placeholder="" data-i18n-ph="title">
+          </div>
+          <div>
+            <label for="company" data-i18n="labelCompany">Firma / Kurum</label>
+            <input type="text" id="company" name="company" placeholder="" data-i18n-ph="company">
+          </div>
+          <div>
+            <label for="email" data-i18n="labelEmail">E-posta</label>
+            <input type="email" id="email" name="email" placeholder="" data-i18n-ph="email">
+          </div>
+          <div>
+            <label for="phone" data-i18n="labelPhone">Telefon</label>
+            <div class="phone-wrap">
+              <span class="phone-prefix">+90</span>
+              <input type="tel" id="phone" name="phone" placeholder="555 555 55 55" maxlength="14" inputmode="numeric" data-i18n-ph="phone">
+            </div>
+          </div>
+          <div>
+            <label for="website" data-i18n="labelWebsite">Web sitesi</label>
+            <input type="url" id="website" name="website" placeholder="ornek.com" data-i18n-ph="website">
+          </div>
+          <div>
+            <label for="wechat" data-i18n="labelWechat">WeChat kullanıcı adı</label>
+            <input type="text" id="wechat" name="wechat" placeholder="" data-i18n-ph="wechat">
+          </div>
+          <div>
+            <label for="address" data-i18n="labelAddress">Adres</label>
+            <input type="text" id="address" name="address" placeholder="" data-i18n-ph="address">
+          </div>
+          <div>
+            <label for="logoUrl" data-i18n="labelLogo">Logo (görsel linki)</label>
+            <input type="url" id="logoUrl" name="logoUrl" placeholder="https://... veya boş bırakın" data-i18n-ph="logoUrl">
+            <p class="hint" style="margin-top: 0.35rem;" data-i18n="logoHint">Logonuzu bir yere yükleyip linkini yapıştırın (örn. GitHub’a logo.png ekleyip buraya sayfa linkini yazın).</p>
+          </div>
+          <button type="button" class="btn" id="btnUpdateQr" data-i18n="btnUpdate">QR Kodu Güncelle</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="previewTitle">Kartvizit Önizleme</h2>
+        <div class="card-preview" id="cardPreviewEditor">
+          <div class="card-avatar" id="avatar">?</div>
+          <div class="card-logo hidden" id="avatarLogo"><img src="" alt=""></div>
+          <div class="card-name" id="previewName">Ad Soyad</div>
+          <div class="card-title" id="previewTitle">Ünvan</div>
+          <div class="card-details" id="previewDetails">
+            <span class="empty-state" data-i18n="emptyDetails">Bilgileri soldan doldurup QR oluşturun.</span>
+          </div>
+        </div>
+        <div class="qr-section">
+          <h3 data-i18n="qrVcard">QR Kod (Rehbere eklemek için tara)</h3>
+          <div id="qrcode">
+            <span class="empty-state" data-i18n="qrEmpty">Önce ad soyad girin ve "QR Kodu Güncelle"ye tıklayın.</span>
+          </div>
+          <p class="hint" data-i18n="qrHint">Telefon kamerası veya bir QR okuyucu ile tarayın; kişi rehbere eklenir.</p>
+        </div>
+        <div class="qr-section">
+          <h3 data-i18n="qrLinkTitle">Çevrim içi kartvizit linki</h3>
+          <p class="hint" style="margin-bottom: 0.5rem;" data-i18n="qrLinkDesc">Bu linki paylaşın veya aşağıdaki QR ile kartvizitinizi taratın.</p>
+          <div id="qrcodeLink">
+            <span class="empty-state" data-i18n="qrLinkEmpty">Bilgileri doldurup "QR Kodu Güncelle"ye tıklayın.</span>
+          </div>
+          <button type="button" class="btn btn-secondary" id="copyLinkBtn" style="display: none;" data-i18n="btnCopyLink">Paylaşım linkini kopyala</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-view" class="container container-view hidden">
+    <div class="lang-bar">
+      <button type="button" class="lang-btn active" data-lang="tr">Türkçe</button>
+      <button type="button" class="lang-btn" data-lang="en">English</button>
+      <button type="button" class="lang-btn" data-lang="zh">中文</button>
+    </div>
+    <div class="card-preview" id="cardPreviewView">
+      <div class="card-avatar" id="viewAvatar">?</div>
+      <div class="card-logo hidden" id="viewLogo"><img src="" alt=""></div>
+      <div class="card-name" id="viewName">—</div>
+      <div class="card-title" id="viewTitle">—</div>
+      <div class="card-details" id="viewDetails"></div>
+    </div>
+    <div class="view-edit-link">
+      <a href="" id="editLink" data-i18n="editLink">Kartviziti düzenle</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var L = {
+        tr: {
+          title: 'QR Dijital Kartvizit',
+          subtitle: 'Bilgilerinizi girin, QR kodu oluşturun. Telefonla tarayarak kişiyi rehbere ekleyebilirsiniz.',
+          formTitle: 'Kişisel Bilgiler',
+          labelName: 'Ad Soyad *',
+          labelTitle: 'Ünvan',
+          labelCompany: 'Firma / Kurum',
+          labelEmail: 'E-posta',
+          labelPhone: 'Telefon',
+          labelWebsite: 'Web sitesi',
+          labelWechat: 'WeChat kullanıcı adı',
+          labelAddress: 'Adres',
+          labelLogo: 'Logo (görsel linki)',
+          logoHint: 'Logonuzu bir yere yükleyip linkini yapıştırın (örn. GitHub\'a logo.png ekleyip buraya sayfa linkini yazın).',
+          btnUpdate: 'QR Kodu Güncelle',
+          previewTitle: 'Kartvizit Önizleme',
+          emptyDetails: 'Bilgileri soldan doldurup QR oluşturun.',
+          qrVcard: 'QR Kod (Rehbere eklemek için tara)',
+          qrEmpty: 'Önce ad soyad girin ve "QR Kodu Güncelle"ye tıklayın.',
+          qrHint: 'Telefon kamerası veya bir QR okuyucu ile tarayın; kişi rehbere eklenir.',
+          qrLinkTitle: 'Çevrim içi kartvizit linki',
+          qrLinkDesc: 'Bu linki paylaşın veya aşağıdaki QR ile kartvizitinizi taratın.',
+          qrLinkEmpty: 'Bilgileri doldurup "QR Kodu Güncelle"ye tıklayın.',
+          btnCopyLink: 'Paylaşım linkini kopyala',
+          editLink: 'Kartviziti düzenle',
+          ph: { name: 'Örn: Ahmet Yılmaz', title: 'Örn: Yazılım Geliştirici', company: 'Örn: ABC Teknoloji', email: 'ahmet@ornek.com', phone: '555 555 55 55', website: 'ornek.com', wechat: 'WeChat ID', address: 'Şehir, ülke', logoUrl: 'https://... veya boş bırakın' }
+        },
+        en: {
+          title: 'QR Digital Business Card',
+          subtitle: 'Enter your details and create a QR code. Others can scan to add you to their contacts.',
+          formTitle: 'Personal Information',
+          labelName: 'Full Name *',
+          labelTitle: 'Title',
+          labelCompany: 'Company',
+          labelEmail: 'Email',
+          labelPhone: 'Phone',
+          labelWebsite: 'Website',
+          labelWechat: 'WeChat username',
+          labelAddress: 'Address',
+          labelLogo: 'Logo (image URL)',
+          logoHint: 'Upload your logo somewhere and paste the link here (e.g. add logo.png to your repo and use that URL).',
+          btnUpdate: 'Update QR Code',
+          previewTitle: 'Card Preview',
+          emptyDetails: 'Fill in the form to see your card.',
+          qrVcard: 'QR Code (Scan to add to contacts)',
+          qrEmpty: 'Enter your name and click "Update QR Code".',
+          qrHint: 'Scan with your phone camera or a QR reader to add this contact.',
+          qrLinkTitle: 'Online card link',
+          qrLinkDesc: 'Share this link or the QR below so others can view your card.',
+          qrLinkEmpty: 'Fill in the form and click "Update QR Code".',
+          btnCopyLink: 'Copy share link',
+          editLink: 'Edit card',
+          ph: { name: 'e.g. John Doe', title: 'e.g. Developer', company: 'e.g. ABC Inc', email: 'john@example.com', phone: '555 555 55 55', website: 'example.com', wechat: 'WeChat ID', address: 'City, country', logoUrl: 'https://... or leave blank' }
+        },
+        zh: {
+          title: 'QR 电子名片',
+          subtitle: '填写您的信息并生成二维码，他人扫码即可将您添加到通讯录。',
+          formTitle: '个人信息',
+          labelName: '姓名 *',
+          labelTitle: '职位',
+          labelCompany: '公司',
+          labelEmail: '电子邮件',
+          labelPhone: '电话',
+          labelWebsite: '网站',
+          labelWechat: '微信号',
+          labelAddress: '地址',
+          labelLogo: 'Logo（图片链接）',
+          logoHint: '将 Logo 上传后在此粘贴图片链接。',
+          btnUpdate: '更新二维码',
+          previewTitle: '名片预览',
+          emptyDetails: '请先在左侧填写信息。',
+          qrVcard: '二维码（扫码添加联系人）',
+          qrEmpty: '请先输入姓名并点击“更新二维码”。',
+          qrHint: '用手机相机或扫码器扫描即可添加联系人。',
+          qrLinkTitle: '在线名片链接',
+          qrLinkDesc: '分享此链接或下方二维码，他人可查看您的名片。',
+          qrLinkEmpty: '请先填写信息并点击“更新二维码”。',
+          btnCopyLink: '复制分享链接',
+          editLink: '编辑名片',
+          ph: { name: '例如：张三', title: '例如：工程师', company: '例如：某某公司', email: 'zhang@example.com', phone: '555 555 55 55', website: 'example.com', wechat: '微信号', address: '城市，国家', logoUrl: 'https://... 或留空' }
+        }
+      };
+
+      var currentLang = 'tr';
+      function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(function (btn) {
+          btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+        });
+        var t = L[lang] || L.tr;
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n');
+          if (key === 'editLink') { el.textContent = t.editLink; return; }
+          if (t[key]) el.textContent = t[key];
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n-ph');
+          if (t.ph && t.ph[key]) el.placeholder = t.ph[key];
+        });
+      }
+      document.querySelectorAll('.lang-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { setLang(btn.getAttribute('data-lang')); });
+      });
+
+      function formatPhone(val) {
+        var d = (val || '').replace(/\D/g, '').slice(0, 10);
+        if (d.length <= 3) return d;
+        if (d.length <= 6) return d.slice(0, 3) + ' ' + d.slice(3);
+        if (d.length <= 8) return d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6);
+        return d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6, 8) + ' ' + d.slice(8);
+      }
+      function phoneDisplay(raw) {
+        var f = formatPhone(raw);
+        return f ? '+90 ' + f : '';
+      }
+      var phoneEl = document.getElementById('phone');
+      if (phoneEl) {
+        phoneEl.addEventListener('input', function () {
+          var pos = this.selectionStart;
+          var oldLen = this.value.length;
+          this.value = formatPhone(this.value);
+          var newLen = this.value.length;
+          this.setSelectionRange(Math.max(0, pos + (this.value.length - oldLen)), this.selectionEnd);
+        });
+      }
+
+      function ensureHttps(url) {
+        var s = (url || '').trim();
+        if (!s) return '';
+        if (/^https?:\/\//i.test(s)) return s;
+        return 'https://' + s;
+      }
+      var websiteEl = document.getElementById('website');
+      if (websiteEl) {
+        websiteEl.addEventListener('blur', function () {
+          var v = this.value.trim();
+          if (v) this.value = ensureHttps(v);
+        });
+      }
+
+      var form = document.getElementById('form');
+      var previewName = document.getElementById('previewName');
+      var previewTitle = document.getElementById('previewTitle');
+      var previewDetails = document.getElementById('previewDetails');
+      var avatar = document.getElementById('avatar');
+      var avatarLogo = document.getElementById('avatarLogo');
+      var qrcodeEl = document.getElementById('qrcode');
+      var qrcodeLinkEl = document.getElementById('qrcodeLink');
+      var copyLinkBtn = document.getElementById('copyLinkBtn');
+      var screenEditor = document.getElementById('screen-editor');
+      var screenView = document.getElementById('screen-view');
+      var viewName = document.getElementById('viewName');
+      var viewTitle = document.getElementById('viewTitle');
+      var viewDetails = document.getElementById('viewDetails');
+      var viewAvatar = document.getElementById('viewAvatar');
+      var viewLogo = document.getElementById('viewLogo');
+      var editLink = document.getElementById('editLink');
+      var btnUpdateQr = document.getElementById('btnUpdateQr');
+
+      var fields = ['name', 'title', 'company', 'email', 'phone', 'website', 'wechat', 'address', 'logoUrl'];
+
+      function getFieldValue(id) {
+        if (!form || !form.elements) return '';
+        var el = form.elements[id];
+        return el ? String(el.value || '').trim() : '';
+      }
+
+      function getInitial() {
+        var name = getFieldValue('name');
+        if (!name) return '?';
+        var parts = name.split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return name[0].toUpperCase();
+      }
+
+      function getWebsite() { return ensureHttps(getFieldValue('website')); }
+      function getPhoneRaw() { return getFieldValue('phone'); }
+      function getPhoneFull() { var r = getPhoneRaw().replace(/\s/g, ''); return r ? '+90' + r : ''; }
+
+      function buildVCard() {
+        var name = getFieldValue('name');
+        var title = getFieldValue('title');
+        var company = getFieldValue('company');
+        var email = getFieldValue('email');
+        var phone = getPhoneFull();
+        var website = getWebsite();
+        var address = getFieldValue('address');
+        var wechat = getFieldValue('wechat');
+        var lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+        if (name) lines.push('FN:' + name.replace(/\n/g, ' '));
+        if (name) {
+          var parts = name.split(/\s+/);
+          var last = parts.pop() || '';
+          var first = parts.join(' ') || name;
+          lines.push('N:' + last + ';' + first + ';;;');
+        }
+        if (title) lines.push('TITLE:' + title.replace(/\n/g, ' '));
+        if (company) lines.push('ORG:' + company.replace(/\n/g, ' '));
+        if (email) lines.push('EMAIL:' + email);
+        if (phone) lines.push('TEL:' + phone);
+        if (website) lines.push('URL:' + website);
+        if (address) lines.push('ADR:;;' + address.replace(/\n/g, ' ') + ';;;;');
+        if (wechat) lines.push('NOTE:WeChat:' + wechat.replace(/\n/g, ' '));
+        lines.push('END:VCARD');
+        return lines.join('\n');
+      }
+
+      function renderDetails(opts) {
+        var email = (opts.email || '').trim();
+        var phone = (opts.phone || '').trim();
+        var website = (opts.website || '').trim();
+        var wechat = (opts.wechat || '').trim();
+        var address = (opts.address || '').trim();
+        var items = [];
+        if (email) items.push('<div>📧 <a href="mailto:' + email + '">' + email + '</a></div>');
+        if (phone) items.push('<div>📱 ' + (opts.phoneDisplay || phone) + '</div>');
+        if (website) items.push('<div>🌐 <a href="' + ensureHttps(website) + '" target="_blank" rel="noopener">' + (opts.websiteDisplay || website) + '</a></div>');
+        if (wechat) items.push('<div>💬 WeChat: ' + wechat + '</div>');
+        if (address) items.push('<div>📍 ' + address + '</div>');
+        return items.length ? items.join('') : '';
+      }
+
+      function updatePreview() {
+        if (!previewName || !previewTitle || !previewDetails) return;
+        var name = getFieldValue('name');
+        var title = getFieldValue('title');
+        var company = getFieldValue('company');
+        var email = getFieldValue('email');
+        var phoneRaw = getPhoneRaw();
+        var website = getWebsite();
+        var wechat = getFieldValue('wechat');
+        var address = getFieldValue('address');
+        var logoUrl = getFieldValue('logoUrl');
+
+        previewName.textContent = name || (currentLang === 'zh' ? '姓名' : currentLang === 'en' ? 'Name' : 'Ad Soyad');
+        var titleParts = [title, company].filter(Boolean);
+        previewTitle.textContent = titleParts.length ? titleParts.join(' · ') : (currentLang === 'zh' ? '职位' : currentLang === 'en' ? 'Title' : 'Ünvan'));
+
+        if (logoUrl && avatar && avatarLogo) {
+          avatar.classList.add('hidden');
+          avatarLogo.classList.remove('hidden');
+          var img = avatarLogo.querySelector('img');
+          if (img) { img.src = ensureHttps(logoUrl); img.alt = name || 'Logo'; }
+        } else {
+          if (avatar) avatar.classList.remove('hidden');
+          if (avatarLogo) avatarLogo.classList.add('hidden');
+          if (avatar) avatar.textContent = getInitial();
+        }
+
+        var html = renderDetails({
+          email: email,
+          phone: phoneRaw ? getPhoneFull() : '',
+          phoneDisplay: phoneRaw ? '+90 ' + formatPhone(phoneRaw) : '',
+          website: website,
+          websiteDisplay: website ? website.replace(/^https?:\/\//i, '') : '',
+          wechat: wechat,
+          address: address
+        });
+        previewDetails.innerHTML = html || '<span class="empty-state">' + (L[currentLang] || L.tr).emptyDetails + '</span>';
+      }
+
+      function getShareUrl() {
+        var name = getFieldValue('name');
+        if (!name) return null;
+        var base = location.origin + location.pathname;
+        var params = new URLSearchParams();
+        fields.forEach(function (id) {
+          var val = getFieldValue(id);
+          if (id === 'website') val = ensureHttps(val);
+          if (id === 'phone') val = getPhoneFull();
+          if (val) params.set(id, val);
+        });
+        return base + (params.toString() ? '?' + params.toString() : '');
+      }
+
+      function updateQR() {
+        if (!qrcodeEl || !qrcodeLinkEl || !copyLinkBtn) return;
+        var name = getFieldValue('name');
+        if (!name) {
+          qrcodeEl.innerHTML = '<span class="empty-state">' + (L[currentLang] || L.tr).qrEmpty + '</span>';
+          qrcodeLinkEl.innerHTML = '<span class="empty-state">' + (L[currentLang] || L.tr).qrLinkEmpty + '</span>';
+          copyLinkBtn.style.display = 'none';
+          return;
+        }
+        var vcard = buildVCard();
+        qrcodeEl.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(vcard) + '" alt="QR" width="200" height="200">';
+        var shareUrl = getShareUrl();
+        if (shareUrl && (location.protocol === 'https:' || location.protocol === 'http:')) {
+          qrcodeLinkEl.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(shareUrl) + '" alt="QR" width="200" height="200">';
+          copyLinkBtn.style.display = 'inline-block';
+        } else {
+          qrcodeLinkEl.innerHTML = '<span class="empty-state">' + (currentLang === 'zh' ? '请将页面部署到 GitHub Pages 后使用在线链接。' : currentLang === 'en' ? 'Deploy to GitHub Pages to use the online link.' : 'Çevrim içi link için sayfayı GitHub Pages\'te yayınlayın.') + '</span>';
+          copyLinkBtn.style.display = 'none';
+        }
+      }
+
+      function showViewMode(params) {
+        screenEditor.classList.add('hidden');
+        screenView.classList.remove('hidden');
+        var name = params.get('name') || '—';
+        var title = params.get('title') || '';
+        var company = params.get('company') || '';
+        var email = params.get('email') || '';
+        var phone = params.get('phone') || '';
+        var website = params.get('website') || '';
+        var wechat = params.get('wechat') || '';
+        var address = params.get('address') || '';
+        var logoUrl = (params.get('logoUrl') || '').trim();
+
+        viewName.textContent = name;
+        viewTitle.textContent = [title, company].filter(Boolean).join(' · ') || '—';
+
+        if (logoUrl) {
+          viewAvatar.classList.add('hidden');
+          viewLogo.classList.remove('hidden');
+          viewLogo.querySelector('img').src = ensureHttps(logoUrl);
+          viewLogo.querySelector('img').alt = name;
+        } else {
+          viewAvatar.classList.remove('hidden');
+          viewLogo.classList.add('hidden');
+          viewAvatar.textContent = name && name !== '—' ? (name.split(/\s+/).length >= 2 ? (name.split(/\s+/)[0][0] + name.split(/\s+/).pop()[0]).toUpperCase() : name[0].toUpperCase()) : '?';
+        }
+
+        var phoneDisplay = phone ? (phone.replace(/^\+90/, '').replace(/\D/g, '').length === 10 ? '+90 ' + formatPhone(phone.replace(/^\+90/, '').replace(/\D/g, '')) : phone) : '';
+        viewDetails.innerHTML = renderDetails({
+          email: email,
+          phone: phone,
+          phoneDisplay: phoneDisplay,
+          website: website,
+          websiteDisplay: website ? website.replace(/^https?:\/\//i, '') : '',
+          wechat: wechat,
+          address: address
+        }) || '';
+
+        editLink.href = location.origin + location.pathname;
+      }
+
+      function showEditorMode() {
+        screenView.classList.add('hidden');
+        screenEditor.classList.remove('hidden');
+      }
+
+      var urlParams = new URLSearchParams(location.search);
+      if (urlParams.has('name')) {
+        fields.forEach(function (id) {
+          var val = urlParams.get(id);
+          var el = document.getElementById(id);
+          if (el && val != null) el.value = val;
+        });
+        showViewMode(urlParams);
+      } else {
+        showEditorMode();
+        setLang('tr');
+        document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n-ph');
+          if (L.tr.ph && L.tr.ph[key]) el.placeholder = L.tr.ph[key];
+        });
+      }
+
+      copyLinkBtn.addEventListener('click', function () {
+        var url = getShareUrl();
+        if (!url) return;
+        navigator.clipboard.writeText(url).then(function () {
+          var t = copyLinkBtn.getAttribute('data-i18n');
+          copyLinkBtn.textContent = currentLang === 'zh' ? '已复制！' : currentLang === 'en' ? 'Copied!' : 'Kopyalandı!';
+          setTimeout(function () { copyLinkBtn.textContent = (L[currentLang] || L.tr).btnCopyLink; }, 2000);
+        });
+      });
+
+      function doUpdate() {
+        try {
+          if (websiteEl && websiteEl.value && websiteEl.value.trim()) websiteEl.value = ensureHttps(websiteEl.value.trim());
+          updatePreview();
+          updateQR();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (form) form.addEventListener('input', doUpdate);
+      if (btnUpdateQr) btnUpdateQr.addEventListener('click', doUpdate);
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        doUpdate();
+      });
+
+      if (!urlParams.has('name')) {
+        doUpdate();
+      }
+    })();
+  </script>
+</body>
+</html>
