@@ -185,9 +185,41 @@
     .btn-secondary:hover { background: #3a3a45; }
     .empty-state { color: var(--muted); font-size: 0.9rem; }
 
+    .view-add-contact {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .view-add-contact-title {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .view-add-contact-btns {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .view-add-contact-btns .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+    .btn-android { background: #3ddc84; color: #0f0f12; }
+    .btn-android:hover { background: #2fc973; }
+    .btn-apple { background: #555; color: #fff; }
+    .btn-apple:hover { background: #666; }
+    .btn-icon { font-size: 1.1rem; }
+
     .view-edit-link {
       text-align: center;
-      margin-top: 1.5rem;
+      margin-top: 1rem;
     }
     .view-edit-link a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
     .view-edit-link a:hover { text-decoration: underline; }
@@ -296,6 +328,19 @@
       <div class="card-title" id="viewTitle">—</div>
       <div class="card-details" id="viewDetails"></div>
     </div>
+    <div class="view-add-contact">
+      <p class="view-add-contact-title" data-i18n="addToContacts">Rehbere ekle</p>
+      <div class="view-add-contact-btns">
+        <a href="#" id="btnSaveContactAndroid" class="btn btn-android">
+          <span class="btn-icon">🤖</span>
+          <span data-i18n="addAndroid">Android</span>
+        </a>
+        <a href="#" id="btnSaveContactApple" class="btn btn-apple">
+          <span class="btn-icon">🍎</span>
+          <span data-i18n="addApple">iPhone / iPad</span>
+        </a>
+      </div>
+    </div>
     <div class="view-edit-link">
       <a href="" id="editLink" data-i18n="editLink">Kartviziti düzenle</a>
     </div>
@@ -329,7 +374,10 @@
           qrLinkEmpty: 'Bilgileri doldurup "QR Kodu Güncelle"ye tıklayın.',
           btnCopyLink: 'Paylaşım linkini kopyala',
           editLink: 'Kartviziti düzenle',
-          ph: { name: 'Örn: Ahmet Yılmaz', title: 'Örn: Yazılım Geliştirici', company: 'Örn: ABC Teknoloji', email: 'ahmet@ornek.com', phone: '555 555 55 55', website: 'ornek.com', wechat: 'WeChat ID', address: 'Şehir, ülke', logoUrl: 'https://... veya boş bırakın' }
+          addToContacts: 'Rehbere ekle',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
+          ph: { name: 'Örn: Ahmet Yılmaz', title: 'Örn: Yazılım Geliştirici', company: 'Örn: ABC Teknoloji', email: 'ahmet@ornek.com', phone: '555 555 55 55', website: 'ornek.com', wechat: 'WeChat ID', address: 'Şehir, ülke', logoUrl: 'https://... veya boş bırakın (logo.jpg kullanır)' }
         },
         en: {
           title: 'QR Digital Business Card',
@@ -356,7 +404,10 @@
           qrLinkEmpty: 'Fill in the form and click "Update QR Code".',
           btnCopyLink: 'Copy share link',
           editLink: 'Edit card',
-          ph: { name: 'e.g. John Doe', title: 'e.g. Developer', company: 'e.g. ABC Inc', email: 'john@example.com', phone: '555 555 55 55', website: 'example.com', wechat: 'WeChat ID', address: 'City, country', logoUrl: 'https://... or leave blank' }
+          addToContacts: 'Add to contacts',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
+          ph: { name: 'e.g. John Doe', title: 'e.g. Developer', company: 'e.g. ABC Inc', email: 'john@example.com', phone: '555 555 55 55', website: 'example.com', wechat: 'WeChat ID', address: 'City, country', logoUrl: 'https://... or leave blank (uses logo.jpg)' }
         },
         zh: {
           title: 'QR 电子名片',
@@ -383,7 +434,10 @@
           qrLinkEmpty: '请先填写信息并点击“更新二维码”。',
           btnCopyLink: '复制分享链接',
           editLink: '编辑名片',
-          ph: { name: '例如：张三', title: '例如：工程师', company: '例如：某某公司', email: 'zhang@example.com', phone: '555 555 55 55', website: 'example.com', wechat: '微信号', address: '城市，国家', logoUrl: 'https://... 或留空' }
+          addToContacts: '添加到通讯录',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
+          ph: { name: '例如：张三', title: '例如：工程师', company: '例如：某某公司', email: 'zhang@example.com', phone: '555 555 55 55', website: 'example.com', wechat: '微信号', address: '城市，国家', logoUrl: 'https://... 或留空（使用 logo.jpg）' }
         }
       };
 
@@ -471,6 +525,16 @@
         return el ? String(el.value || '').trim() : '';
       }
 
+      function getDefaultLogoUrl() {
+        var path = location.pathname.replace(/[^/]*$/, '');
+        return location.origin + path + 'logo.jpg';
+      }
+
+      function getLogoUrl() {
+        var url = getFieldValue('logoUrl');
+        return url ? ensureHttps(url) : getDefaultLogoUrl();
+      }
+
       function getInitial() {
         var name = getFieldValue('name');
         if (!name) return '?';
@@ -536,7 +600,7 @@
         var website = getWebsite();
         var wechat = getFieldValue('wechat');
         var address = getFieldValue('address');
-        var logoUrl = getFieldValue('logoUrl');
+        var logoUrl = getLogoUrl();
 
         var nameFallback = currentLang === 'zh' ? '\u59d3\u540d' : currentLang === 'en' ? 'Name' : 'Ad Soyad';
         previewName.textContent = name || nameFallback;
@@ -544,11 +608,19 @@
         var titleFallback = currentLang === 'zh' ? '\u804c\u4f4d' : currentLang === 'en' ? 'Title' : 'Ünvan';
         previewTitle.textContent = titleParts.length ? titleParts.join(' \u00B7 ') : titleFallback;
 
-        if (logoUrl && avatar && avatarLogo) {
+        if (avatar && avatarLogo) {
           avatar.classList.add('hidden');
           avatarLogo.classList.remove('hidden');
           var img = avatarLogo.querySelector('img');
-          if (img) { img.src = ensureHttps(logoUrl); img.alt = name || 'Logo'; }
+          if (img) {
+            img.src = logoUrl;
+            img.alt = name || 'Logo';
+            img.onerror = function () {
+              avatarLogo.classList.add('hidden');
+              avatar.classList.remove('hidden');
+              avatar.textContent = getInitial();
+            };
+          }
         } else {
           if (avatar) avatar.classList.remove('hidden');
           if (avatarLogo) avatarLogo.classList.add('hidden');
@@ -576,6 +648,7 @@
           var val = getFieldValue(id);
           if (id === 'website') val = ensureHttps(val);
           if (id === 'phone') val = getPhoneFull();
+          if (id === 'logoUrl' && val) val = ensureHttps(val);
           if (val) params.set(id, val);
         });
         return base + (params.toString() ? '?' + params.toString() : '');
@@ -603,6 +676,46 @@
         }
       }
 
+      function buildVCardFromParams(params) {
+        var name = (params.get('name') || '').trim();
+        var title = (params.get('title') || '').trim();
+        var company = (params.get('company') || '').trim();
+        var email = (params.get('email') || '').trim();
+        var phone = (params.get('phone') || '').trim();
+        var website = ensureHttps((params.get('website') || '').trim());
+        var address = (params.get('address') || '').trim();
+        var wechat = (params.get('wechat') || '').trim();
+        var lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+        if (name) lines.push('FN:' + name.replace(/\n/g, ' '));
+        if (name) {
+          var parts = name.split(/\s+/);
+          var last = parts.pop() || '';
+          var first = parts.join(' ') || name;
+          lines.push('N:' + last + ';' + first + ';;;');
+        }
+        if (title) lines.push('TITLE:' + title.replace(/\n/g, ' '));
+        if (company) lines.push('ORG:' + company.replace(/\n/g, ' '));
+        if (email) lines.push('EMAIL:' + email);
+        if (phone) lines.push('TEL:' + phone.replace(/\s/g, ''));
+        if (website) lines.push('URL:' + website);
+        if (address) lines.push('ADR:;;' + address.replace(/\n/g, ' ') + ';;;;');
+        if (wechat) lines.push('NOTE:WeChat:' + wechat.replace(/\n/g, ' '));
+        lines.push('END:VCARD');
+        return lines.join('\n');
+      }
+
+      function downloadVCard(vcard, filename) {
+        filename = filename || 'contact.vcf';
+        var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }
+
       function showViewMode(params) {
         screenEditor.classList.add('hidden');
         screenView.classList.remove('hidden');
@@ -614,20 +727,22 @@
         var website = params.get('website') || '';
         var wechat = params.get('wechat') || '';
         var address = params.get('address') || '';
-        var logoUrl = (params.get('logoUrl') || '').trim();
+        var logoUrl = (params.get('logoUrl') || '').trim() || getDefaultLogoUrl();
 
         viewName.textContent = name;
-        viewTitle.textContent = [title, company].filter(Boolean).join(' · ') || '—';
+        viewTitle.textContent = [title, company].filter(Boolean).join(' \u00B7 ') || '—';
 
-        if (logoUrl) {
-          viewAvatar.classList.add('hidden');
-          viewLogo.classList.remove('hidden');
-          viewLogo.querySelector('img').src = ensureHttps(logoUrl);
-          viewLogo.querySelector('img').alt = name;
-        } else {
-          viewAvatar.classList.remove('hidden');
-          viewLogo.classList.add('hidden');
-          viewAvatar.textContent = name && name !== '—' ? (name.split(/\s+/).length >= 2 ? (name.split(/\s+/)[0][0] + name.split(/\s+/).pop()[0]).toUpperCase() : name[0].toUpperCase()) : '?';
+        viewAvatar.classList.add('hidden');
+        viewLogo.classList.remove('hidden');
+        var viewLogoImg = viewLogo.querySelector('img');
+        if (viewLogoImg) {
+          viewLogoImg.src = ensureHttps(logoUrl);
+          viewLogoImg.alt = name;
+          viewLogoImg.onerror = function () {
+            viewLogo.classList.add('hidden');
+            viewAvatar.classList.remove('hidden');
+            viewAvatar.textContent = name && name !== '—' ? (name.split(/\s+/).length >= 2 ? (name.split(/\s+/)[0][0] + name.split(/\s+/).pop()[0]).toUpperCase() : name[0].toUpperCase()) : '?';
+          };
         }
 
         var phoneDisplay = phone ? (phone.replace(/^\+90/, '').replace(/\D/g, '').length === 10 ? '+90 ' + formatPhone(phone.replace(/^\+90/, '').replace(/\D/g, '')) : phone) : '';
@@ -642,6 +757,17 @@
         }) || '';
 
         editLink.href = location.origin + location.pathname;
+
+        var vcard = buildVCardFromParams(params);
+        var contactName = (name !== '—' ? name.replace(/\s+/g, '_') : 'contact') + '.vcf';
+        var btnAndroid = document.getElementById('btnSaveContactAndroid');
+        var btnApple = document.getElementById('btnSaveContactApple');
+        if (btnAndroid) {
+          btnAndroid.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
+        }
+        if (btnApple) {
+          btnApple.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
+        }
       }
 
       function showEditorMode() {
