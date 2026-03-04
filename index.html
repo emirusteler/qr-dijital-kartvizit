@@ -339,6 +339,19 @@
       <div class="card-title" id="viewTitle">—</div>
       <div class="card-details" id="viewDetails"></div>
     </div>
+    <div class="view-add-contact">
+      <p class="view-add-contact-title" data-i18n="addToContacts">Rehbere ekle</p>
+      <div class="view-add-contact-btns">
+        <a href="#" id="btnSaveContactAndroid" class="btn btn-android">
+          <span class="btn-icon">🤖</span>
+          <span data-i18n="addAndroid">Android</span>
+        </a>
+        <a href="#" id="btnSaveContactApple" class="btn btn-apple">
+          <span class="btn-icon">🍎</span>
+          <span data-i18n="addApple">iPhone / iPad</span>
+        </a>
+      </div>
+    </div>
     <div class="view-add-note">
       <button type="button" class="btn btn-note" id="btnAddNote" data-i18n="addNote">Not ekle</button>
       <div class="view-note-area hidden" id="viewNoteArea">
@@ -375,6 +388,9 @@
           qrLinkDesc: 'Bu linki paylaşın veya aşağıdaki QR ile kartvizitinizi taratın.',
           qrLinkEmpty: 'Bilgileri doldurup "QR Kodu Güncelle"ye tıklayın.',
           btnCopyLink: 'Paylaşım linkini kopyala',
+          addToContacts: 'Rehbere ekle',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
           addNote: 'Not ekle',
           copyNote: 'Notu kopyala',
           notePlaceholder: 'Buraya notunuzu yazın...',
@@ -404,6 +420,9 @@
           qrLinkDesc: 'Share this link or the QR below so others can view your card.',
           qrLinkEmpty: 'Fill in the form and click "Update QR Code".',
           btnCopyLink: 'Copy share link',
+          addToContacts: 'Add to contacts',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
           addNote: 'Add note',
           copyNote: 'Copy note',
           notePlaceholder: 'Type your note here...',
@@ -433,6 +452,9 @@
           qrLinkDesc: '分享此链接或下方二维码，他人可查看您的名片。',
           qrLinkEmpty: '请先填写信息并点击“更新二维码”。',
           btnCopyLink: '复制分享链接',
+          addToContacts: '添加到通讯录',
+          addAndroid: 'Android',
+          addApple: 'iPhone / iPad',
           addNote: '添加备注',
           copyNote: '复制备注',
           notePlaceholder: '在此输入备注...',
@@ -675,6 +697,46 @@
         }
       }
 
+      function buildVCardFromParams(params) {
+        var name = (params.get('name') || '').trim();
+        var title = (params.get('title') || '').trim();
+        var company = (params.get('company') || '').trim();
+        var email = (params.get('email') || '').trim();
+        var phone = (params.get('phone') || '').trim();
+        var website = ensureHttps((params.get('website') || '').trim());
+        var address = (params.get('address') || '').trim();
+        var wechat = (params.get('wechat') || '').trim();
+        var lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+        if (name) lines.push('FN:' + name.replace(/\n/g, ' '));
+        if (name) {
+          var parts = name.split(/\s+/);
+          var last = parts.pop() || '';
+          var first = parts.join(' ') || name;
+          lines.push('N:' + last + ';' + first + ';;;');
+        }
+        if (title) lines.push('TITLE:' + title.replace(/\n/g, ' '));
+        if (company) lines.push('ORG:' + company.replace(/\n/g, ' '));
+        if (email) lines.push('EMAIL:' + email);
+        if (phone) lines.push('TEL:' + phone.replace(/\s/g, ''));
+        if (website) lines.push('URL:' + website);
+        if (address) lines.push('ADR:;;' + address.replace(/\n/g, ' ') + ';;;;');
+        if (wechat) lines.push('NOTE:WeChat:' + wechat.replace(/\n/g, ' '));
+        lines.push('END:VCARD');
+        return lines.join('\n');
+      }
+
+      function downloadVCard(vcard, filename) {
+        filename = filename || 'contact.vcf';
+        var blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }
+
       function showViewMode(params) {
         screenEditor.classList.add('hidden');
         screenView.classList.remove('hidden');
@@ -717,6 +779,17 @@
 
         if (viewNoteArea) viewNoteArea.classList.add('hidden');
         if (viewNoteText) viewNoteText.value = '';
+
+        var vcard = buildVCardFromParams(params);
+        var contactName = (name !== '—' ? name.replace(/\s+/g, '_') : 'contact') + '.vcf';
+        var btnAndroid = document.getElementById('btnSaveContactAndroid');
+        var btnApple = document.getElementById('btnSaveContactApple');
+        if (btnAndroid) {
+          btnAndroid.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
+        }
+        if (btnApple) {
+          btnApple.onclick = function (e) { e.preventDefault(); downloadVCard(vcard, contactName); };
+        }
       }
 
       function showEditorMode() {
