@@ -317,7 +317,7 @@
           labelWechat: 'WeChat kullanıcı adı',
           labelAddress: 'Adres',
           labelLogo: 'Logo (görsel linki)',
-          logoHint: 'Logonuzu bir yere yükleyip linkini yapıştırın (örn. GitHub\'a logo.png ekleyip buraya sayfa linkini yazın).',
+          logoHint: "Logonuzu bir yere yükleyip linkini yapıştırın (örn. GitHub'a logo.png ekleyip buraya sayfa linkini yazın).",
           btnUpdate: 'QR Kodu Güncelle',
           previewTitle: 'Kartvizit Önizleme',
           emptyDetails: 'Bilgileri soldan doldurup QR oluşturun.',
@@ -538,9 +538,11 @@
         var address = getFieldValue('address');
         var logoUrl = getFieldValue('logoUrl');
 
-        previewName.textContent = name || (currentLang === 'zh' ? '姓名' : currentLang === 'en' ? 'Name' : 'Ad Soyad');
+        var nameFallback = currentLang === 'zh' ? '\u59d3\u540d' : currentLang === 'en' ? 'Name' : 'Ad Soyad';
+        previewName.textContent = name || nameFallback;
         var titleParts = [title, company].filter(Boolean);
-        previewTitle.textContent = titleParts.length ? titleParts.join(' · ') : (currentLang === 'zh' ? '职位' : currentLang === 'en' ? 'Title' : 'Ünvan'));
+        var titleFallback = currentLang === 'zh' ? '\u804c\u4f4d' : currentLang === 'en' ? 'Title' : 'Ünvan';
+        previewTitle.textContent = titleParts.length ? titleParts.join(' \u00B7 ') : titleFallback;
 
         if (logoUrl && avatar && avatarLogo) {
           avatar.classList.add('hidden');
@@ -595,7 +597,8 @@
           qrcodeLinkEl.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(shareUrl) + '" alt="QR" width="200" height="200">';
           copyLinkBtn.style.display = 'inline-block';
         } else {
-          qrcodeLinkEl.innerHTML = '<span class="empty-state">' + (currentLang === 'zh' ? '请将页面部署到 GitHub Pages 后使用在线链接。' : currentLang === 'en' ? 'Deploy to GitHub Pages to use the online link.' : 'Çevrim içi link için sayfayı GitHub Pages\'te yayınlayın.') + '</span>';
+          var msg = currentLang === 'zh' ? '\u8bf7\u5c06\u9875\u9762\u90e8\u7f72\u5230 GitHub Pages \u540e\u4f7f\u7528\u5728\u7ebf\u94fe\u63a5\u3002' : currentLang === 'en' ? 'Deploy to GitHub Pages to use the online link.' : "Çevrim içi link için sayfayı GitHub Pages'te yayınlayın.";
+          qrcodeLinkEl.innerHTML = '<span class="empty-state">' + msg + '</span>';
           copyLinkBtn.style.display = 'none';
         }
       }
